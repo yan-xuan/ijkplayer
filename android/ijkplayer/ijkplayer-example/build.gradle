@@ -8,6 +8,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     lintOptions {
+        checkReleaseBuilds false
         abortOnError false
     }
     defaultConfig {
@@ -23,9 +24,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "full"
     productFlavors {
-        all32 { minSdkVersion 9 }
-        all64 { minSdkVersion 21 }
+        all32 {
+            minSdkVersion 9
+            dimension "full"
+        }
+
+        all64 {
+            minSdkVersion 21
+            dimension "full"
+        }
+
         // armv5 {}
         // armv7a {}
         // arm64 { minSdkVersion 21 }
