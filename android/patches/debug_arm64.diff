@@ -1,8 +1,70 @@
+diff --git a/android/ijkplayer/ijkplayer-arm64/build.gradle b/android/ijkplayer/ijkplayer-arm64/build.gradle
+index a8cbe0cb..3a68135c 100644
+--- a/android/ijkplayer/ijkplayer-arm64/build.gradle
++++ b/android/ijkplayer/ijkplayer-arm64/build.gradle
+@@ -8,18 +8,40 @@ android {
+     buildToolsVersion rootProject.ext.buildToolsVersion
+ 
+     defaultConfig {
+-        minSdkVersion 21
++        minSdkVersion 9
+         targetSdkVersion rootProject.ext.targetSdkVersion
++
++        //添加
++        externalNativeBuild {
++            ndkBuild {
++                arguments "NDK_APPLICATION:=src/main/jni/Application.mk"
++                abiFilters "arm64-v8a"
++            }
++        }
+     }
++
+     buildTypes {
++        debug {
++            debuggable true
++            jniDebuggable true
++            ndk {
++                debuggable true
++            }
++        }
+         release {
+             minifyEnabled false
+             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+         }
+     }
+-    sourceSets.main {
+-        jniLibs.srcDirs 'src/main/libs'
+-        jni.srcDirs = [] // This prevents the auto generation of Android.mk
++//    sourceSets.main {
++//        jniLibs.srcDirs 'src/main/libs'
++//        jni.srcDirs = [] // This prevents the auto generation of Android.mk
++//    }
++    // 添加native代码主编译脚本Android.mk的文件路径
++    externalNativeBuild {
++        ndkBuild {
++            path "src/main/jni/Android.mk"
++        }
+     }
+ }
+ 
+diff --git a/android/ijkplayer/ijkplayer-arm64/src/main/jni/Application.mk b/android/ijkplayer/ijkplayer-arm64/src/main/jni/Application.mk
+index 19189c34..feab151b 100644
+--- a/android/ijkplayer/ijkplayer-arm64/src/main/jni/Application.mk
++++ b/android/ijkplayer/ijkplayer-arm64/src/main/jni/Application.mk
+@@ -25,7 +25,7 @@ APP_PIE := false
+ 
+ APP_STL := stlport_static
+ 
+-APP_CFLAGS := -O3 -Wall -pipe \
++APP_CFLAGS := -O1 -Wall -pipe \
+     -ffast-math \
+     -fstrict-aliasing -Werror=strict-aliasing \
+     -Wno-psabi -Wa,--noexecstack \
 diff --git a/android/ijkplayer/ijkplayer-armv7a/build.gradle b/android/ijkplayer/ijkplayer-armv7a/build.gradle
-index b3b7b3a8..a588f7e2 100644
+index b3b7b3a8..82da15ad 100644
 --- a/android/ijkplayer/ijkplayer-armv7a/build.gradle
 +++ b/android/ijkplayer/ijkplayer-armv7a/build.gradle
-@@ -10,16 +10,39 @@ android {
+@@ -10,16 +10,38 @@ android {
      defaultConfig {
          minSdkVersion 9
          targetSdkVersion rootProject.ext.targetSdkVersion
@@ -11,8 +73,7 @@ index b3b7b3a8..a588f7e2 100644
 +        externalNativeBuild {
 +            ndkBuild {
 +                arguments "NDK_APPLICATION:=src/main/jni/Application.mk"
-+//                abiFilters "armeabi-v7a"
-+                abiFilters "arm64-v8a"
++                abiFilters "armeabi-v7a"
 +            }
 +        }
      }
