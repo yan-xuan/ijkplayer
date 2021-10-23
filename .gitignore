@@ -18,6 +18,9 @@ ijkprof/android-ndk-profiler/
 # files for the dex VM
 *.dex
 
+# vscode
+.vscode
+
 # Java class files
 *.class
 
