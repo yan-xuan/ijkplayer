@@ -59,6 +59,7 @@ static player_fields_t g_clazz;
 
 static int inject_callback(void *opaque, int type, void *data, size_t data_size);
 static bool mediacodec_select_callback(void *opaque, ijkmp_mediacodecinfo_context *mcc);
+static bool notify_save_image_callback(void *opaque, const char * filePath, int time);
 
 static IjkMediaPlayer *jni_get_media_player(JNIEnv* env, jobject thiz)
 {
@@ -879,6 +880,23 @@ fail:
     return found_codec_name;
 }
 
+static bool notify_save_image_callback(void *opaque, const char * filePath, int time)
+{
+    MPTRACE("%s\n", __func__);
+
+    JNIEnv *env = NULL;
+    if (JNI_OK != SDL_JNI_SetupThreadEnv(&env)) {
+        ALOGE("%s: SetupThreadEnv failed\n", __func__);
+        return false;
+    }
+
+    jobject weak_this = (jobject) opaque;
+
+    return J4AC_IjkMediaPlayer__onNotifySaveImage(env, weak_this, filePath, time);
+}
+
+
+
 inline static void post_event(JNIEnv *env, jobject weak_this, int what, int arg1, int arg2)
 {
     // MPTRACE("post_event(%p, %p, %d, %d, %d)", (void*)env, (void*) weak_this, what, arg1, arg2);
@@ -1200,6 +1218,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved)
 
     ijkmp_global_init();
     ijkmp_global_set_inject_callback(inject_callback);
+    ijkmp_global_set_notify_save_image_callback(notify_save_image_callback);
 
     FFmpegApi_global_init(env);
 

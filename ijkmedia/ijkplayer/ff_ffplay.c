@@ -73,6 +73,7 @@
 #include "ijkmeta.h"
 #include "ijkversion.h"
 #include "ijkplayer.h"
+#include "ijkavutil/imageutils.h"
 #include <stdatomic.h>
 #if defined(__ANDROID__)
 #include "ijksoundtouch/ijksoundtouch_wrap.h"
@@ -2172,6 +2173,12 @@ static int decoder_start(Decoder *d, int (*fn)(void *), void *arg, const char *n
     return 0;
 }
 
+static ijk_notify_save_image_callback s_notify_save_image_callback = NULL;
+void ffp_global_set_notify_save_image_callback(ijk_notify_save_image_callback cb)
+{
+    s_notify_save_image_callback = cb;
+}
+
 static int ffplay_video_thread(void *arg)
 {
     FFPlayer *ffp = arg;
@@ -2322,6 +2329,15 @@ static int ffplay_video_thread(void *arg)
 #if CONFIG_AVFILTER
         }
 #endif
+
+        bool bSaveIamge = true;
+        if (ret == 0 && bSaveIamge) {
+            const char * filePath = "/mnt/sdcard/temp/.image/1.png";
+            bool succ = SaveImage(filePath, frame);
+            if (succ) {
+                s_notify_save_image_callback(ffp->app_ctx->opaque, filePath, 100);
+            }
+        }
 
         if (ret < 0)
             goto the_end;
@@ -3935,6 +3951,8 @@ void ffp_global_set_inject_callback(ijk_inject_callback cb)
 {
     s_inject_callback = cb;
 }
+
+
 
 void ffp_io_stat_register(void (*cb)(const char *url, int type, int bytes))
 {

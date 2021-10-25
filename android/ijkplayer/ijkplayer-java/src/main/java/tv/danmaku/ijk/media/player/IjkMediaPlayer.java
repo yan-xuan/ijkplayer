@@ -1281,6 +1281,34 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         }
     }
 
+    /**
+     * 保存图片通知
+     */
+    public interface OnNotifySaveImageListener {
+        void onNotifySaveImage(IMediaPlayer mp, String filePath, int time);
+    }
+    private OnNotifySaveImageListener mOnNotifySaveImageListener;
+    public void setOnNotifySaveImageListener(OnNotifySaveImageListener listener) {
+        mOnNotifySaveImageListener = listener;
+    }
+
+    @CalledByNative
+    private static void onNotifySaveImage(Object weakThiz, String filePath, int time) {
+        if (weakThiz == null || !(weakThiz instanceof WeakReference<?>))
+            return;
+
+        @SuppressWarnings("unchecked")
+        WeakReference<IjkMediaPlayer> weakPlayer = (WeakReference<IjkMediaPlayer>) weakThiz;
+        IjkMediaPlayer player = weakPlayer.get();
+        if (player == null)
+            return;
+
+        OnNotifySaveImageListener listener = player.mOnNotifySaveImageListener;
+        if (listener != null) {
+            listener.onNotifySaveImage(player, filePath, time);
+        }
+    }
+
     public static native void native_profileBegin(String libName);
     public static native void native_profileEnd();
     public static native void native_setLogLevel(int level);

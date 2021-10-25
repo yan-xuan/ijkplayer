@@ -30,6 +30,7 @@ typedef struct J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer {
     jmethodID method_postEventFromNative;
     jmethodID method_onSelectCodec;
     jmethodID method_onNativeInvoke;
+    jmethodID method_onNotifySaveImage;     // 增加的保存图片通知
 } J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer;
 static J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer class_J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer;
 
@@ -324,6 +325,30 @@ jboolean J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer__onNativeInvoke__catchA
     return ret_value;
 }
 
+jboolean J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer__onNotifySaveImage(JNIEnv *env, jobject weakThiz, const char* filePath_cstr__, jint time)
+{
+    jstring filePath = NULL;
+    filePath = (*env)->NewStringUTF(env, filePath_cstr__);
+    if (J4A_ExceptionCheck__throwAny(env) || !filePath) {
+        J4A_DeleteLocalRef__p(env, &filePath);
+        return false;
+    }
+
+    (*env)->CallStaticBooleanMethod(env, class_J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer.id, class_J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer.method_onNotifySaveImage, weakThiz, filePath, time);
+    return true;
+}
+
+jboolean J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer__onNotifySaveImage__catchAll(JNIEnv *env, jobject weakThiz, const char* filePath_cstr__, jint time)
+{
+    jboolean ret_value = J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer__onNotifySaveImage(env, weakThiz, filePath_cstr__, time);
+    if (J4A_ExceptionCheck__catchAll(env)) {
+        return false;
+    }
+
+    return ret_value;
+}
+
+
 int J4A_loadClass__J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer(JNIEnv *env)
 {
     int         ret                   = -1;
@@ -381,6 +406,15 @@ int J4A_loadClass__J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer(JNIEnv *env)
     class_J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer.method_onNativeInvoke = J4A_GetStaticMethodID__catchAll(env, class_id, name, sign);
     if (class_J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer.method_onNativeInvoke == NULL)
         goto fail;
+
+    // 增加的保存图片通知
+    class_id = class_J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer.id;
+    name     = "onNotifySaveImage";
+    sign     = "(Ljava/lang/Object;Ljava/lang/String;I)V";
+    class_J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer.method_onNotifySaveImage = J4A_GetStaticMethodID__catchAll(env, class_id, name, sign);
+    if (class_J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer.method_onNotifySaveImage == NULL)
+        goto fail;
+
 
     J4A_ALOGD("J4ALoader: OK: '%s' loaded\n", "tv.danmaku.ijk.media.player.IjkMediaPlayer");
     ret = 0;

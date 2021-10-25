@@ -91,6 +91,11 @@ void ijkmp_global_set_inject_callback(ijk_inject_callback cb)
     ffp_global_set_inject_callback(cb);
 }
 
+void ijkmp_global_set_notify_save_image_callback(ijk_notify_save_image_callback cb)
+{
+    ffp_global_set_notify_save_image_callback(cb);
+}
+
 const char *ijkmp_version()
 {
     return IJKPLAYER_VERSION;
