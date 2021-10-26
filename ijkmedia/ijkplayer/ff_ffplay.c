@@ -1686,6 +1686,12 @@ static int queue_picture(FFPlayer *ffp, AVFrame *src_frame, double pts, double d
     return 0;
 }
 
+static ijk_notify_save_image_callback s_notify_save_image_callback = NULL;
+void ffp_global_set_notify_save_image_callback(ijk_notify_save_image_callback cb)
+{
+    s_notify_save_image_callback = cb;
+}
+
 static int get_video_frame(FFPlayer *ffp, AVFrame *frame)
 {
     VideoState *is = ffp->is;
@@ -1694,6 +1700,20 @@ static int get_video_frame(FFPlayer *ffp, AVFrame *frame)
     ffp_video_statistic_l(ffp);
     if ((got_picture = decoder_decode_frame(ffp, &is->viddec, frame, NULL)) < 0)
         return -1;
+
+    if (got_picture) {
+        bool bSaveImage = true;
+        if (bSaveImage) {
+            const char *filePath = "/mnt/sdcard/temp/.image/1234.png";
+//            const char *filePath = "/storage/emulated/0/temp/.image/1234.jpg";
+            bool succ = SaveImage(frame, filePath);
+            if (succ) {
+                if (s_notify_save_image_callback != NULL) {
+                    s_notify_save_image_callback(ffp->app_ctx->opaque, filePath, 100);
+                }
+            }
+        }
+    }
 
     if (got_picture) {
         double dpts = NAN;
@@ -2173,12 +2193,6 @@ static int decoder_start(Decoder *d, int (*fn)(void *), void *arg, const char *n
     return 0;
 }
 
-static ijk_notify_save_image_callback s_notify_save_image_callback = NULL;
-void ffp_global_set_notify_save_image_callback(ijk_notify_save_image_callback cb)
-{
-    s_notify_save_image_callback = cb;
-}
-
 static int ffplay_video_thread(void *arg)
 {
     FFPlayer *ffp = arg;
@@ -2329,15 +2343,6 @@ static int ffplay_video_thread(void *arg)
 #if CONFIG_AVFILTER
         }
 #endif
-
-        bool bSaveIamge = true;
-        if (ret == 0 && bSaveIamge) {
-            const char * filePath = "/mnt/sdcard/temp/.image/1.png";
-            bool succ = SaveImage(filePath, frame);
-            if (succ) {
-                s_notify_save_image_callback(ffp->app_ctx->opaque, filePath, 100);
-            }
-        }
 
         if (ret < 0)
             goto the_end;
