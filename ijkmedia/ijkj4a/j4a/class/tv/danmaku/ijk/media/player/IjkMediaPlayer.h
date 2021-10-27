@@ -51,6 +51,10 @@ const char *J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer__onSelectCodec__with
 jboolean J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer__onNativeInvoke(JNIEnv *env, jobject weakThiz, jint what, jobject args);
 jboolean J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer__onNativeInvoke__catchAll(JNIEnv *env, jobject weakThiz, jint what, jobject args);
 int J4A_loadClass__J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer(JNIEnv *env);
+// onNotifySaveImage
+jboolean J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer__onNotifySaveImage(JNIEnv *env, jobject weakThiz, const char* filePath_cstr__, jint time);
+jboolean J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer__onNotifySaveImage__catchAll(JNIEnv *env, jobject weakThiz, const char* filePath_cstr__, jint time);
+
 
 #define J4A_HAVE_SIMPLE__J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer
 
@@ -82,5 +86,6 @@ int J4A_loadClass__J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer(JNIEnv *env);
 #define J4AC_IjkMediaPlayer__onNativeInvoke__catchAll J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer__onNativeInvoke__catchAll
 #define J4A_loadClass__J4AC_IjkMediaPlayer J4A_loadClass__J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer
 #define J4AC_IjkMediaPlayer__onNotifySaveImage J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer__onNotifySaveImage
+#define J4AC_IjkMediaPlayer__onNotifySaveImage__catchAll J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer__onNotifySaveImage__catchAll
 
 #endif//J4A__tv_danmaku_ijk_media_player_IjkMediaPlayer__H

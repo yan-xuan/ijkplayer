@@ -334,7 +334,7 @@ jboolean J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer__onNotifySaveImage(JNIE
         return false;
     }
 
-    (*env)->CallStaticBooleanMethod(env, class_J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer.id, class_J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer.method_onNotifySaveImage, weakThiz, filePath, time);
+    (*env)->CallStaticVoidMethod(env, class_J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer.id, class_J4AC_tv_danmaku_ijk_media_player_IjkMediaPlayer.method_onNotifySaveImage, weakThiz, NULL, time);
     return true;
 }
 
