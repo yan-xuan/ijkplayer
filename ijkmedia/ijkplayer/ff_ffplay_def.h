@@ -720,6 +720,9 @@ typedef struct FFPlayer {
     char *mediacodec_default_name;
     int ijkmeta_delay_init;
     int render_wait_start;
+
+    bool is_save_image;
+    char save_image_root_dir[1024];
 } FFPlayer;
 
 #define fftime_to_milliseconds(ts) (av_rescale(ts, 1000, AV_TIME_BASE))
@@ -853,6 +856,9 @@ inline static void ffp_reset_internal(FFPlayer *ffp)
     ffp->ijkio_inject_opaque = NULL;
     ffp_reset_statistic(&ffp->stat);
     ffp_reset_demux_cache_control(&ffp->dcc);
+
+    ffp->is_save_image = false;
+    memset(ffp->save_image_root_dir, 0, sizeof(ffp->save_image_root_dir));
 }
 
 inline static void ffp_notify_msg1(FFPlayer *ffp, int what) {

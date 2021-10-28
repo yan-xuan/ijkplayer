@@ -1292,8 +1292,17 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         mOnNotifySaveImageListener = listener;
     }
 
+    /**
+     * 保存图片设置
+     */
+    public void setImageStoragePath(String storageDir) {
+        _setImageStoragePath(storageDir);
+    }
+    private native void _setImageStoragePath(String storageDir);
+
     @CalledByNative
     private static void onNotifySaveImage(Object weakThiz, String filePath, int time) {
+        Log.e("test", "notify image path: " + filePath + " time: " + time);
         if (weakThiz == null || !(weakThiz instanceof WeakReference<?>))
             return;
 

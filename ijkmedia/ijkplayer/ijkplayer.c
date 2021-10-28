@@ -155,6 +155,16 @@ void ijkmp_set_frame_at_time(IjkMediaPlayer *mp, const char *path, int64_t start
     MPTRACE("%s()=void\n", __func__);
 }
 
+void ijkmp_set_image_storage_path(IjkMediaPlayer *mp, const char *storageDir)
+{
+    assert(mp);
+
+    MPTRACE("%s(%s)\n", __func__, storageDir);
+    ffp_set_image_storage_path(mp->ffplayer, storageDir);
+    MPTRACE("%s()=void\n", __func__);
+}
+
+
 
 void *ijkmp_set_ijkio_inject_opaque(IjkMediaPlayer *mp, void *opaque)
 {

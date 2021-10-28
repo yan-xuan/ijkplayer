@@ -1145,6 +1145,29 @@ LABEL_RETURN:
 }
 
 
+static void
+IjkMediaPlayer_setImageStoragePath(JNIEnv *env, jobject thiz, jstring _storageDir)
+{
+    IjkMediaPlayer *mp = jni_get_media_player(env, thiz);
+    JNI_CHECK_GOTO(mp, env, "java/lang/IllegalStateException", "mpjni: setImageStoragePath: null mp", LABEL_RETURN);
+
+    const char *storageDir = NULL;
+    if (_storageDir != NULL) {
+        storageDir = (*env)->GetStringUTFChars(env, _storageDir, NULL);
+        JNI_CHECK_GOTO(storageDir, env, "java/lang/OutOfMemoryError","mpjni: setImageStoragePath: path.string oom", LABEL_RETURN);
+    }
+
+    ALOGV("setImageStoragePath: path %s", storageDir);
+    ijkmp_set_image_storage_path(mp, storageDir);
+    if (storageDir != NULL) {
+        (*env)->ReleaseStringUTFChars(env, _storageDir, storageDir);
+    }
+
+LABEL_RETURN:
+    ijkmp_dec_ref_p(&mp);
+    return;
+}
+
 
 
 
@@ -1197,6 +1220,7 @@ static JNINativeMethod g_methods[] = {
 
     { "native_setLogLevel",     "(I)V",                     (void *) IjkMediaPlayer_native_setLogLevel },
     { "_setFrameAtTime",        "(Ljava/lang/String;JJII)V", (void *) IjkMediaPlayer_setFrameAtTime },
+    { "_setImageStoragePath",   "(Ljava/lang/String;)V",    (void *) IjkMediaPlayer_setImageStoragePath },
 };
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved)

@@ -1697,13 +1697,18 @@ static int get_video_frame(FFPlayer *ffp, AVFrame *frame)
         return -1;
 
     if (got_picture) {
-        bool bSaveImage = true;
+        bool bSaveImage = ffp_is_save_image(ffp);
         if (bSaveImage) {
-            const char *filePath = "/mnt/sdcard/temp/.image/1234.png";
+            char *rootDir = NULL;
+            rootDir = ffp_get_save_image_root_path(ffp);
+            if (strlen(rootDir) > 4) {
 //            const char *filePath = "/storage/emulated/0/temp/.image/1234.jpg";
-            bool succ = SaveImage(frame, filePath);
-            if (succ) {
-                ffp_notify_msg4(ffp, FFP_MSG_SAVE_IMAGE, frame->pts, 0, filePath, strlen(filePath) + 1);
+                char filePath[1024];
+                sprintf(filePath, "%s/%lld.png", ffp_get_save_image_root_path(ffp), frame->pts);
+                bool succ = SaveImage(frame, filePath);
+                if (succ) {
+                    ffp_notify_msg4(ffp, FFP_MSG_SAVE_IMAGE, frame->pts, 0, filePath, strlen(filePath) + 1);
+                }
             }
         }
     }
@@ -5057,6 +5062,35 @@ void ffp_set_property_int64(FFPlayer *ffp, int id, int64_t value)
     }
 }
 
+char* ffp_get_save_image_root_path(FFPlayer *ffp)
+{
+    if (!ffp)
+        return NULL;
+
+    return ffp->save_image_root_dir;
+}
+
+bool ffp_is_save_image(FFPlayer *ffp)
+{
+    if (!ffp)
+        return false;
+
+    return ffp->is_save_image;
+}
+
+void ffp_set_image_storage_path(FFPlayer *ffp, const char *storage_dir)
+{
+    if (storage_dir == NULL || strlen(storage_dir) <= 4) {
+        ffp->is_save_image = false;
+        memset(ffp->save_image_root_dir, 0, sizeof (ffp->save_image_root_dir));
+    } else {
+        memset(ffp->save_image_root_dir, 0, sizeof (ffp->save_image_root_dir));
+        memcpy(ffp->save_image_root_dir, storage_dir, strlen(storage_dir));
+        ffp->is_save_image = true;
+    }
+}
+
+
 IjkMediaMeta *ffp_get_meta_l(FFPlayer *ffp)
 {
     if (!ffp)
@@ -5064,3 +5098,5 @@ IjkMediaMeta *ffp_get_meta_l(FFPlayer *ffp)
 
     return ffp->meta;
 }
+
+

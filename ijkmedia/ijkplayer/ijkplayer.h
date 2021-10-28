@@ -218,4 +218,7 @@ void           *ijkmp_set_weak_thiz(IjkMediaPlayer *mp, void *weak_thiz);
 int             ijkmp_get_msg(IjkMediaPlayer *mp, AVMessage *msg, int block);
 void            ijkmp_set_frame_at_time(IjkMediaPlayer *mp, const char *path, int64_t start_time, int64_t end_time, int num, int definition);
 
+// 设置用于保存图片的根路径, 若路径为空则表示不保存
+void ijkmp_set_image_storage_path(IjkMediaPlayer *mp, const char *storageDir);
+
 #endif

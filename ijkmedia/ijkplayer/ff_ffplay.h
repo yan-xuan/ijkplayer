@@ -116,6 +116,11 @@ void      ffp_set_property_float(FFPlayer *ffp, int id, float value);
 int64_t   ffp_get_property_int64(FFPlayer *ffp, int id, int64_t default_value);
 void      ffp_set_property_int64(FFPlayer *ffp, int id, int64_t value);
 
+char*     ffp_get_save_image_root_path(FFPlayer *ffp);
+bool      ffp_is_save_image(FFPlayer *ffp);
+void      ffp_set_image_storage_path(FFPlayer *ffp, const char *storage_dir);
+
+
 // must be freed with free();
 struct IjkMediaMeta *ffp_get_meta_l(FFPlayer *ffp);
 
