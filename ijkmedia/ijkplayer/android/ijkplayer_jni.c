@@ -59,7 +59,7 @@ static player_fields_t g_clazz;
 
 static int inject_callback(void *opaque, int type, void *data, size_t data_size);
 static bool mediacodec_select_callback(void *opaque, ijkmp_mediacodecinfo_context *mcc);
-static bool notify_save_image_callback(void *opaque, const char * filePath, int time);
+//static bool notify_save_image_callback(JNIEnv *env, jobject weak_this, const char * filePath, int time);
 
 static IjkMediaPlayer *jni_get_media_player(JNIEnv* env, jobject thiz)
 {
@@ -880,18 +880,18 @@ fail:
     return found_codec_name;
 }
 
-static bool notify_save_image_callback(void *opaque, const char * filePath, int time)
+static bool notify_save_image_callback(JNIEnv *env, jobject weak_this, const char * filePath, int time)
 {
     MPTRACE("%s\n", __func__);
 
-    JNIEnv *env = NULL;
-    if (JNI_OK != SDL_JNI_SetupThreadEnv(&env)) {
-        ALOGE("%s: SetupThreadEnv failed\n", __func__);
-        return false;
-    }
-
-    jobject weak_this = (jobject) opaque;
-
+//    JNIEnv *env = NULL;
+//    if (JNI_OK != SDL_JNI_SetupThreadEnv(&env)) {
+//        ALOGE("%s: SetupThreadEnv failed\n", __func__);
+//        return false;
+//    }
+//
+//    jobject weak_this = (jobject) opaque;
+//
     return J4AC_IjkMediaPlayer__onNotifySaveImage(env, weak_this, filePath, time);
 }
 
@@ -1036,6 +1036,14 @@ static void message_loop_n(JNIEnv *env, IjkMediaPlayer *mp)
         case FFP_MSG_AUDIO_SEEK_RENDERING_START:
             MPTRACE("FFP_MSG_AUDIO_SEEK_RENDERING_START:\n");
             post_event(env, weak_thiz, MEDIA_INFO, MEDIA_INFO_AUDIO_SEEK_RENDERING_START, msg.arg1);
+            break;
+        case FFP_MSG_SAVE_IMAGE:
+            if (msg.obj) {
+                jstring jFilePath = (*env)->NewStringUTF(env, (char *)msg.obj);
+                const char *filePath = (char *)msg.obj;
+                notify_save_image_callback(env, weak_thiz, filePath, msg.arg1);
+                J4A_DeleteLocalRef__p(env, &jFilePath);
+            }
             break;
         default:
             ALOGE("unknown FFP_MSG_xxx(%d)\n", msg.what);
@@ -1218,7 +1226,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved)
 
     ijkmp_global_init();
     ijkmp_global_set_inject_callback(inject_callback);
-    ijkmp_global_set_notify_save_image_callback(notify_save_image_callback);
+//    ijkmp_global_set_notify_save_image_callback(notify_save_image_callback);
 
     FFmpegApi_global_init(env);
 

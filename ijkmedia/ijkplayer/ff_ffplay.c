@@ -1708,12 +1708,13 @@ static int get_video_frame(FFPlayer *ffp, AVFrame *frame)
 //            const char *filePath = "/storage/emulated/0/temp/.image/1234.jpg";
             bool succ = SaveImage(frame, filePath);
             if (succ) {
-                if (s_notify_save_image_callback != NULL) {
-                    av_log(ffp, AV_LOG_ERROR, "11111 vf_rate=%f\n", ffp->pf_playback_rate);
-                    s_notify_save_image_callback(ffp->app_ctx->opaque, filePath, 100);
-//                } else {
-//                    av_log(ffp, AV_LOG_ERROR, "222222 vf_rate=%f\n", ffp->pf_playback_rate);
-                }
+                ffp_notify_msg4(ffp, FFP_MSG_SAVE_IMAGE, frame->pts, 0, filePath, strlen(filePath) + 1);
+//                if (s_notify_save_image_callback != NULL) {
+//                    av_log(ffp, AV_LOG_ERROR, "11111 vf_rate=%f\n", ffp->pf_playback_rate);
+//                    s_notify_save_image_callback(ffp->app_ctx->opaque, filePath, 100);
+////                } else {
+////                    av_log(ffp, AV_LOG_ERROR, "222222 vf_rate=%f\n", ffp->pf_playback_rate);
+//                }
             }
         }
     }
