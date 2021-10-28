@@ -6,6 +6,9 @@
 #include "libavutil/pixfmt.h"
 #include "libavcodec/avcodec.h"
 #include "libavcodec/avcodec.h"
+// #include "android/bitmap.h"
+// #include "../../ijksdl/android/ijksdl_android_jni.h"
+// #include "jni.h"
 
 
 
@@ -160,35 +163,32 @@ bool SaveImage(struct AVFrame *frame, const char *filePath)
         return false;
     }
 
-    enum AVPixelFormat pixelFormat = (enum AVPixelFormat)frame->format;
+    enum AVPixelFormat framePixFmt = (enum AVPixelFormat)frame->format;
 
     // 获取其支持的Pixel Format
-    bool isSupportedPixFmt = false;
+    enum AVPixelFormat encodePixFmt = pCodec->pix_fmts[0];
     const enum AVPixelFormat *pix_fmts = pCodec->pix_fmts;
     while (pix_fmts != NULL) {
         enum AVPixelFormat avPixFmt = *pix_fmts;
         if (avPixFmt >= AV_PIX_FMT_NB || avPixFmt <= AV_PIX_FMT_NONE)
             break;
 
-        if (avPixFmt == pixelFormat) {
-            isSupportedPixFmt = true;
+        if (avPixFmt == framePixFmt) {
+            encodePixFmt = framePixFmt;
             break;
         }
 
         pix_fmts += sizeof(enum AVPixelFormat);
     }
 
-
-
     int imageWidth = frame->width;
     int imageHeight = frame->height;
 
     bool needReclaimMem = false;
     AVFrame *avFrame = frame;
-    enum AVPixelFormat encodePixFmt = pixelFormat;
-    if (!isSupportedPixFmt) {    // convert pixel format
+    if (encodePixFmt != framePixFmt) {    // convert pixel format
         avFrame = NULL;
-        encodePixFmt = AV_PIX_FMT_YUV420P;
+        encodePixFmt = pCodec->pix_fmts[0];
         bool succ = ConvertAVFrame(frame, encodePixFmt, imageWidth, imageHeight, &avFrame);
         if (!succ) {
             av_log(NULL, AV_LOG_ERROR, "Convert color is failed!");
@@ -420,14 +420,113 @@ bool SaveImage(struct AVFrame *frame, const char *filePath)
 
 
 
-
-
-// bool SaveImage(AVFrame *frame, const char *filePath)
+// bool save_to_bitmap(AVFrame *frame)
 // {
-//     AVCodecID id = AV_CODEC_ID_NONE;
-//     // AVPixelFormat pixel;
-//     // pixel = AV_PIX_FMT_YUV420P;
-//     return false;
+//     if (frame == NULL)
+//         return false;
+
+//     enum AVPixelFormat pixelFormat = (enum AVPixelFormat)frame->format;
+//     int imageWidth = frame->width;
+//     int imageHeight = frame->height;
+
+//     bool needReclaimMem = false;
+//     AVFrame *avFrame = frame;
+//     enum AVPixelFormat encodePixFmt = pixelFormat;
+//     if (pixelFormat != AV_PIX_FMT_RGBA && pixelFormat != AV_PIX_FMT_RGB24) {
+//         avFrame = NULL;
+//         encodePixFmt = AV_PIX_FMT_RGBA;
+//         bool succ = ConvertAVFrame(frame, encodePixFmt, imageWidth, imageHeight, &avFrame);
+//         if (!succ) {
+//             av_log(NULL, AV_LOG_ERROR, "Convert color is failed!");
+//             return false;
+//         }
+
+//         needReclaimMem = true;
+//     }
+
+//     JNIEnv *env = NULL;
+//     if (JNI_OK != SDL_JNI_SetupThreadEnv(&env)) {
+//         av_log(NULL, AV_LOG_ERROR, "SetupThreadEnv failed");
+//         return false;
+//     }
+
+//     // Create an android Bitmap object
+//     jobject jBitmapConfig = NULL;
+//     jclass clazzBitmapConfig = J4A_FindClass__catchAll(env, "android/graphics/Bitmap$Config");
+//     if (clazzBitmapConfig == NULL) {
+//         jfieldID id = J4A_GetStaticFieldID__catchAll(env, clazzBitmapConfig, "ARGB_8888", "Landroid/graphics/Bitmap$Config;");
+//         if (id) {
+//             jBitmapConfig = (*env)->GetStaticObjectField(env, clazzBitmapConfig, id);
+//         }
+//     }
+
+//     jobject jBitmap = NULL;
+//     if (jBitmapConfig != NULL) {
+//         jclass clazzBitmap = J4A_FindClass__catchAll(env, "android/graphics/Bitmap");
+//         if (clazzBitmap != NULL) {
+//             jmethodID id = J4A_GetStaticMethodID__catchAll(env, clazzBitmap, "createBitmap", "(IILandroid/graphics/Bitmap$Config;)Landroid/graphics/Bitmap;");
+//             if (id) {
+//                 jBitmap = (*env)->CallStaticObjectMethod(env, clazzBitmap, id, (jint)imageWidth, (jint)imageHeight, jBitmapConfig);
+//             }
+//         }
+//     }
+
+//     if (jBitmap == NULL) {
+//         J4A_ExceptionCheck__catchAll(env);
+//         if (needReclaimMem && avFrame != NULL) {
+//             av_frame_free(&avFrame);
+//             avFrame = NULL;
+//         }
+//         return false;
+//     }
+
+//     // AndroidBitmapInfo bmpInfo;
+//     // if (AndroidBitmap_getInfo(env, jBitmap, &bmpInfo) != ANDROID_BITMAP_RESULT_SUCCESS) {
+//     //     av_log(NULL, AV_LOG_ERROR, "AndroidBitmap_getInfo() failed!");
+//     //     if (needReclaimMem && avFrame != NULL) {
+//     //         av_frame_free(&avFrame);
+//     //         avFrame = NULL;
+//     //     }
+//     //     return false;
+//     // }
+
+//     // assert(bmpInfo.format == ANDROID_BITMAP_FORMAT_RGBA_8888);
+//     // assert((int)bmpInfo.width == imageWidth);
+//     // assert((int)bmpInfo.height == imageHeight);
+
+//     // void *pixels = NULL;
+//     // if (AndroidBitmap_lockPixels(env, jBitmap, &pixels) != ANDROID_BITMAP_RESULT_SUCCESS) {
+//     //     av_log(NULL, AV_LOG_ERROR, "AndroidBitmap_lockPixels() failed!");
+//     //     if (needReclaimMem && avFrame != NULL) {
+//     //         av_frame_free(&avFrame);
+//     //         avFrame = NULL;
+//     //     }
+//     //     return false;
+//     // }
+
+//     // if (bmpInfo.stride == (uint32_t)avFrame->linesize[0]) {
+//     //     memcpy(pixels, avFrame->data[0], bmpInfo.stride * bmpInfo.height);
+//     // } else {
+//     //     uint8_t *bmpPtr = (uint8_t *)pixels;
+//     //     for (uint32_t row = 0; row < bmpInfo.height; row++, bmpPtr += bmpInfo.stride)
+//     //         memcpy(bmpPtr, (uint8_t *)avFrame->data[0] + row * avFrame->linesize[0], bmpInfo.width * 4);
+//     // }
+
+//     // if (AndroidBitmap_unlockPixels(env, jBitmap) != ANDROID_BITMAP_RESULT_SUCCESS) {
+//     //     av_log(NULL, AV_LOG_ERROR, "AndroidBitmap_unlockPixels() failed!");
+//     // }
+
+//     // if (needReclaimMem && avFrame != NULL) {
+//     //     av_frame_free(&avFrame);
+//     //     avFrame = NULL;
+//     // }
+
+//     return true;
 // }
+//
+
+
+
+
 
 
