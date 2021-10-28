@@ -1686,11 +1686,6 @@ static int queue_picture(FFPlayer *ffp, AVFrame *src_frame, double pts, double d
     return 0;
 }
 
-static ijk_notify_save_image_callback s_notify_save_image_callback;
-void ffp_global_set_notify_save_image_callback(ijk_notify_save_image_callback cb)
-{
-    s_notify_save_image_callback = cb;
-}
 
 static int get_video_frame(FFPlayer *ffp, AVFrame *frame)
 {
@@ -1709,12 +1704,6 @@ static int get_video_frame(FFPlayer *ffp, AVFrame *frame)
             bool succ = SaveImage(frame, filePath);
             if (succ) {
                 ffp_notify_msg4(ffp, FFP_MSG_SAVE_IMAGE, frame->pts, 0, filePath, strlen(filePath) + 1);
-//                if (s_notify_save_image_callback != NULL) {
-//                    av_log(ffp, AV_LOG_ERROR, "11111 vf_rate=%f\n", ffp->pf_playback_rate);
-//                    s_notify_save_image_callback(ffp->app_ctx->opaque, filePath, 100);
-////                } else {
-////                    av_log(ffp, AV_LOG_ERROR, "222222 vf_rate=%f\n", ffp->pf_playback_rate);
-//                }
             }
         }
     }
