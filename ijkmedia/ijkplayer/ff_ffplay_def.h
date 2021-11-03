@@ -723,6 +723,7 @@ typedef struct FFPlayer {
 
     bool is_save_image;
     char save_image_root_dir[1024];
+    int  frame_count;
 } FFPlayer;
 
 #define fftime_to_milliseconds(ts) (av_rescale(ts, 1000, AV_TIME_BASE))
@@ -858,6 +859,7 @@ inline static void ffp_reset_internal(FFPlayer *ffp)
     ffp_reset_demux_cache_control(&ffp->dcc);
 
     ffp->is_save_image = false;
+    ffp->frame_count = 0;
     memset(ffp->save_image_root_dir, 0, sizeof(ffp->save_image_root_dir));
 }
 

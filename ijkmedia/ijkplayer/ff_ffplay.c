@@ -5075,7 +5075,9 @@ bool ffp_is_save_image(FFPlayer *ffp)
     if (!ffp)
         return false;
 
-    return ffp->is_save_image;
+    ffp->frame_count ++;
+
+    return ffp->is_save_image && ffp->frame_count % 2 == 0;
 }
 
 void ffp_set_image_storage_path(FFPlayer *ffp, const char *storage_dir)
